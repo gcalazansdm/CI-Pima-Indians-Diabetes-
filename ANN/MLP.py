@@ -1,35 +1,32 @@
+from ANN.ANN import ANN
+
 from keras.models import Model
 
 from keras.layers import Input
 from keras.layers import Dense
 
 from keras.optimizers import Adam
-from keras.layers import Activation
 
-import matplotlib.pyplot as plt
-import numpy as np
+class MLP(ANN):
+    def __init__(self,extra = ""):
+        super().__init__()
+        self.name = "MLP" + extra
 
-import math
-import datetime
-import os
+    def create_network(self):
+        input_layer = Input(shape=(8,))
 
-def step(x):
-	if x < 0:
-		return 0.0
-	else:
-		return 0.5
+        # camada escondida
+        hidden_layer = Dense(units=5,
+                             activation='relu')(input_layer)
 
-def create_network():
-    input_layer = Input(shape=(8,))
+        # camada de saida
 
-    # camada escondida
-    hidden_layer = Dense(units=5,
-                         activation='relu')(input_layer)
+        output_layer = Dense(units=2,activation='softmax')(hidden_layer)
 
-    # camada de saida
-    output_layer = Dense(units=2,activation='softmax')(hidden_layer)
+        classifier = Model(inputs=input_layer, outputs=output_layer)
+        classifier.compile(optimizer=Adam(0.001), loss='categorical_crossentropy', metrics=['accuracy','categorical_accuracy'])
 
-    classifier = Model(inputs=input_layer, outputs=output_layer)
-    classifier.compile(optimizer=Adam(0.005), loss='categorical_crossentropy', metrics=['accuracy','categorical_accuracy'])
+        return classifier
 
-    return classifier
+    def test(self, test_base):
+        return self.test_ann(test_base)
